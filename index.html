@@ -178,7 +178,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-14 08:53:19" itemprop="dateModified" datetime="2022-04-14T08:53:19+08:00">2022-04-14</time>
+                <time title="修改时间：2022-04-14 09:29:10" itemprop="dateModified" datetime="2022-04-14T09:29:10+08:00">2022-04-14</time>
               </span>
 
           
@@ -211,7 +211,7 @@
 </ol>
 <h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><p>GFS没有实现POSIX 接口，文件被目录组织成层级结构，并支持create、delete、open等操作。</p>
 <p>重点是，GFS支持低开销的快照snapshot和原子append（record append）。</p>
-<h3 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h3><p><img src="/.com//04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/GFS%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="Alt Text" title="Title Text"></p>
+<h3 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h3><p><img src="/2022/04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/GFS%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="Alt Text"></p>
 <p>上图是GFS的整体架构，有几个重要角色，chunkserver、client、master，通常都是运行在Linux上的用户进程。</p>
 <p>文件被划分为固定大小的chunk（这个大小很有讲究，后面会说）。每个chunk被一个不可更改并且全局唯一的64bit <em>chunk handle</em>标识，在这个chunk被创建的时候被赋值。chunkserver将chunk存储为本地的linux文件。读写chunk中的数据需要chunk handle以及字节范围。为了可靠性，一个chunk被存储多份，在不同的机器上（高可用一章会讲）。</p>
 <p>master负者维护所有元数据。包括namespace、访问控制信息、从文件到chunk的映射、chunk的当前位置。同时master也控制系统级的行为，例如chunk租约管理、垃圾回收、chunk迁移。master与chunkserver进行周期性的心跳通信，来下发指令和搜集状态。</p>
@@ -238,7 +238,7 @@
 <h3 id="一致性模型"><a href="#一致性模型" class="headerlink" title="一致性模型"></a>一致性模型</h3><h6 id="GFS的保证"><a href="#GFS的保证" class="headerlink" title="GFS的保证"></a>GFS的保证</h6><p>这一部分感觉是最难懂的，需要结合后面三四章的内容一起看才能完全明白。这里就按照原文简单提一下。</p>
 <p>文件的namespace的修改是原子的，这是通过读写锁保证的，后面会介绍。</p>
 <p>对于文件本身的数据，按照我的理解，GFS提供的保证其实是比较弱的保证。对于串行没有其他client干扰的write和record append，GFS保证一致性（这里的一致性的含义是，所有副本保存的数据是相同的），同时还保证defined语义。defined语义按照我的理解是不发生脏写，也就是多个并发执行的写操作不会互相覆盖，client可以在中间读取到某一次写操作的完整更新内容。由于串行执行，没有并发操作，当然满足defined语义了。如果有并发执行的写操作，对于write而言，不满足defined但满足一致性。而对于record append而言，不管有没有并发写操作，都是defined的，并且有穿插不一致性（但是基本没有影响），这个和record append的实现有关，后面会讲。最后，失败的修改肯定是会导致不一致的了。</p>
-<p><img src="/.com//04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/%E4%B8%80%E8%87%B4%E6%80%A7.png" alt="Alt Text" title="Title Text"></p>
+<p><img src="/2022/04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/%E4%B8%80%E8%87%B4%E6%80%A7.png" alt="Alt Text"></p>
 <p>对于前面提到串行的写操作，GFS通过（a）对所有副本执行相同顺序的修改操作 （b）使用chunk的版本号检测过时的副本（由于chunkserver下线导致修改丢失）。</p>
 <p>过时的副本从不会被包含进一个修改中，也不会在client向master请求的时候，由master响应包含（具体机制后面讲）。后面自动被垃圾回收处理掉。但是由于client会缓存chunk的位置信息，所以有可能读到过时的副本数据。但是这个时间窗口被缓存过期时间和下一次open限制住了。另外由于大多数写操作都是append的，所以这种情况下client读到的只是提前结束的数据而不是过时的数据。当client联系master时，会立即得到新数据的位置。</p>
 <h6 id="对应用程序的影响"><a href="#对应用程序的影响" class="headerlink" title="对应用程序的影响"></a>对应用程序的影响</h6><p>GFS的应用程序能够容忍宽松的一致性模型。</p>
@@ -248,7 +248,7 @@
 <h3 id="租约和修改顺序"><a href="#租约和修改顺序" class="headerlink" title="租约和修改顺序"></a>租约和修改顺序</h3><p>租约的设计主要是为了最小化master的开销。master给某个chunk一个租约，这个chunk称为主副本（primary）。当每个修改（mutation）操作执行时，主副本选择对这个chunk执行的所有操作的顺序，所有副本都按相同顺序执行修改操作。因此，全局的修改顺序被master的租约顺序和主副本的执行顺序确定。</p>
 <p>租约最开始有60s的超时，只要这个chunk被修改，主副本能够无限地请求延长租约。这些请求和响应的包含在心跳中。</p>
 <p>master即使失去了和主副本的通信，也能够在一个租约到期后，安全地将租约赋给别的副本。</p>
-<p><img src="/.com//04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/%E5%86%99%E6%8E%A7%E5%88%B6%E6%B5%81%E5%92%8C%E6%95%B0%E6%8D%AE%E6%B5%81.png" alt="Alt Text" title="Title Text"></p>
+<p><img src="/2022/04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/%E5%86%99%E6%8E%A7%E5%88%B6%E6%B5%81%E5%92%8C%E6%95%B0%E6%8D%AE%E6%B5%81.png" alt="Alt Text"></p>
 <p>下面解释上图中写操作流程。</p>
 <ol>
 <li>client向master询问哪个chunkserver拥有当前chunk的租约，以及其余从副本的位置。</li>
