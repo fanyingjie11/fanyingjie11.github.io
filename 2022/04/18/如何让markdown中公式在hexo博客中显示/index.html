@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"fanyingjie11.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="问题发现 最近自己捣鼓了一下博客，按照网上教程一步步来，把博客弄好了，迫不及待地发布了一篇文章，结果发现图片无法显示。上网一查发现是由于hexo和markdown的图片引用格式不一致。于是又Google了半天，终于把问题给比较好地解决了。 解决方案 首先，对typora的设置进行调整，让图片自动保存到相同位置的同名文件夹下。  这样，如果我如果在D:\Blog\source\posts目">
+  <meta name="description" content="主要参考了下面这篇帖子： 让 Hexo Next (v8.0.0) 支持 LaTeX 数学公式 步骤如下：  安装pandoc，并配置config.yml文件。  由于我是win10系统，直接下载了zip文件，并解压到D盘（解压位置可任意）。然后在博客的根目录下的_config.yml文件最后面加上 12pandoc:  pandoc_path: D:&#x2F;pandoc-2.18-wi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="typora和hexo图片显示的问题">
-<meta property="og:url" content="https://fanyingjie11.github.io/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%84%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:title" content="如何让markdown中公式在hexo博客中显示">
+<meta property="og:url" content="https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/index.html">
 <meta property="og:site_name" content="夏天不热">
-<meta property="og:description" content="问题发现 最近自己捣鼓了一下博客，按照网上教程一步步来，把博客弄好了，迫不及待地发布了一篇文章，结果发现图片无法显示。上网一查发现是由于hexo和markdown的图片引用格式不一致。于是又Google了半天，终于把问题给比较好地解决了。 解决方案 首先，对typora的设置进行调整，让图片自动保存到相同位置的同名文件夹下。  这样，如果我如果在D:\Blog\source\posts目">
+<meta property="og:description" content="主要参考了下面这篇帖子： 让 Hexo Next (v8.0.0) 支持 LaTeX 数学公式 步骤如下：  安装pandoc，并配置config.yml文件。  由于我是win10系统，直接下载了zip文件，并解压到D盘（解压位置可任意）。然后在博客的根目录下的_config.yml文件最后面加上 12pandoc:  pandoc_path: D:&#x2F;pandoc-2.18-wi">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-04-14T03:11:41.017Z">
-<meta property="article:modified_time" content="2022-04-18T15:04:48.373Z">
+<meta property="article:published_time" content="2022-04-18T14:58:02.858Z">
+<meta property="article:modified_time" content="2022-04-18T15:15:33.855Z">
 <meta property="article:author" content="Yingjie Fan">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://fanyingjie11.github.io/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%84%E9%97%AE%E9%A2%98/">
+<link rel="canonical" href="https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>typora和hexo图片显示的问题 | 夏天不热</title>
+  <title>如何让markdown中公式在hexo博客中显示 | 夏天不热</title>
   
 
 
@@ -170,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%84%E9%97%AE%E9%A2%98/">
+    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/%E5%A4%B4%E5%83%8F.png">
@@ -183,7 +183,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          typora和hexo图片显示的问题
+          如何让markdown中公式在hexo博客中显示
         </h1>
 
         <div class="post-meta">
@@ -192,16 +192,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-04-14 11:11:41" itemprop="dateCreated datePublished" datetime="2022-04-14T11:11:41+08:00">2022-04-14</time>
+              <time title="创建时间：2022-04-18 22:58:02 / 修改时间：23:15:33" itemprop="dateCreated datePublished" datetime="2022-04-18T22:58:02+08:00">2022-04-18</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-18 23:04:48" itemprop="dateModified" datetime="2022-04-18T23:04:48+08:00">2022-04-18</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -234,22 +228,35 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="问题发现">问题发现</h1>
-<p>最近自己捣鼓了一下博客，按照网上教程一步步来，把博客弄好了，迫不及待地发布了一篇文章，结果发现图片无法显示。上网一查发现是由于hexo和markdown的图片引用格式不一致。于是又Google了半天，终于把问题给比较好地解决了。</p>
-<h1 id="解决方案">解决方案</h1>
-<p>首先，对typora的设置进行调整，让图片自动保存到相同位置的同名文件夹下。</p>
-<p><img
-src="/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%84%E9%97%AE%E9%A2%98/image-20220414111729211.png" /></p>
-<p>这样，如果我如果在D:\Blog\source\posts目录下建了一个A.md文件，则对应就会在相同目录下出现一个A文件夹，里面保存了A.md中的所有图片。</p>
-<p>接下来，需要利用一个插件（hexo-asset-link），首先安装插件</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -s hexo-asset-link</span><br></pre></td></tr></table></figure>
-<p>设置config.yml文件中的post_asset_folder为true</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">post_asset_folder: true</span><br></pre></td></tr></table></figure>
-<p>然后就是</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-<p>完事了，可以发现图片既能在typora中显示，也能在博客中正常显示。</p>
-<p>需要注意的问题是，在引用图片时，需要满足格式：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![XXX](A/XXX.png)</span><br></pre></td></tr></table></figure>
+        <p>主要参考了下面这篇帖子：</p>
+<p><a
+target="_blank" rel="noopener" href="https://dog.wtf/tech/making-hexo-next-theme-latex-math-equation-supported/">让
+Hexo Next (v8.0.0) 支持 LaTeX 数学公式</a></p>
+<p>步骤如下：</p>
+<ol type="1">
+<li>安装<a
+target="_blank" rel="noopener" href="https://pandoc.org/installing.html">pandoc</a>，并配置config.yml文件。</li>
+</ol>
+<p>由于我是win10系统，直接下载了zip文件，并解压到D盘（解压位置可任意）。然后在博客的根目录下的_config.yml文件最后面加上</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pandoc:</span><br><span class="line">  pandoc_path: D:/pandoc-2.18-windows-x86_64/pandoc-2.18/pandoc.exe</span><br></pre></td></tr></table></figure>
+<p>上面的绝对路径就是解压出来的pandoc.exe文件的路径，一定需要加到配置文件里，不然会找不到而报错。</p>
+<ol start="2" type="1">
+<li>更换默认渲染引擎</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm un hexo-renderer-marked</span><br><span class="line">npm i hexo-renderer-pandoc</span><br></pre></td></tr></table></figure>
+<ol start="3" type="1">
+<li>修改next主题配置文件</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">math:</span><br><span class="line">  # Default (true) will load mathjax / katex script on demand.</span><br><span class="line">  # That is it only render those page which has `mathjax: true` in Front-matter.</span><br><span class="line">  # If you set it to false, it will load mathjax / katex srcipt EVERY PAGE.</span><br><span class="line">  per_page: true</span><br><span class="line"></span><br><span class="line">  # hexo-renderer-pandoc (or hexo-renderer-kramed) required for full MathJax support.</span><br><span class="line">  mathjax:</span><br><span class="line">    enable: true</span><br><span class="line">    # See: https://mhchem.github.io/MathJax-mhchem/</span><br><span class="line">    mhchem: false</span><br><span class="line"></span><br><span class="line">  # hexo-renderer-markdown-it-plus (or hexo-renderer-markdown-it with markdown-it-katex plugin) required for full Katex support.</span><br><span class="line">  katex:</span><br><span class="line">    enable: false</span><br><span class="line">    # See: https://github.com/KaTeX/KaTeX/tree/master/contrib/copy-tex</span><br><span class="line">    copy_tex: false</span><br></pre></td></tr></table></figure>
+<p>需要注意的点：</p>
+<ul>
+<li>mathjax和katex只能有一个enable，我选择mathjax，相比katex，mathjax更重量级，但对LaTeX支持更好。</li>
+<li>per_page即可以设置为true，也可以设置为false。设置为true的含义是，需要人为在博文最前面的格式控制（title那一栏）中添加上mathjax:
+true，对指定的博文进行渲染。false表示对所有博文进行渲染，所以无需添加额外的东西了。这里我为了效率考虑，选择true，只不过如果后面写的博文需要渲染，则必须手动添加mathjax:
+true。</li>
+</ul>
+<p>到这里就可以开心地让博文显示LaTeX公式了。</p>
+<p>最后提一个编写公式需要注意的地方，行内公式的内容和$符号之间不要有空格，不然可能出现typora能显示，hexo博文显示错误的问题。</p>
 
     </div>
 
@@ -265,7 +272,7 @@ src="/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%8
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://fanyingjie11.github.io/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%84%E9%97%AE%E9%A2%98/" title="typora和hexo图片显示的问题">https://fanyingjie11.github.io/2022/04/14/typora和hexo显示图片的问题/</a>
+    <a href="https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/" title="如何让markdown中公式在hexo博客中显示">https://fanyingjie11.github.io/2022/04/18/如何让markdown中公式在hexo博客中显示/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -282,13 +289,10 @@ src="/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%8
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/" rel="prev" title="《The Google File System》论文阅读">
-      <i class="fa fa-chevron-left"></i> 《The Google File System》论文阅读
+    <a href="/2022/04/18/%E7%89%9B%E9%A1%BF%E6%B3%95/" rel="prev" title="牛顿迭代法">
+      <i class="fa fa-chevron-left"></i> 牛顿迭代法
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/04/18/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E8%A7%A3%E9%87%8A%20%E7%AC%AC%E4%B8%80%E7%AB%A0/" rel="next" title="《计算机程序的构造和解释》书籍阅读">
-      《计算机程序的构造和解释》书籍阅读 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -352,7 +356,6 @@ src="/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%8
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%8F%91%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">问题发现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">2.</span> <span class="nav-text">解决方案</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -499,6 +502,59 @@ src="/2022/04/14/typora%E5%92%8Chexo%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87%E7%9A%8
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
