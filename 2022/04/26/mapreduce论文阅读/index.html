@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"fanyingjie11.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="问答 mapreduce是干啥的？ 答：mapreduce是一个编程模型，用来处理和生成大规模数据集。用户通过指定map和reduce函数以及输入数据等，将计算任务表达为mapreduce的任务。即使是没有分布式系统编程经验的程序员，也可以通过mapreduce来利用大规模集群，因为mapreduce帮助管理好一切，包括输入数据分区、调度多台机器上的程序执行、处理机器故障和管理机器间的通信等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mapreduce论文阅读">
+<meta property="og:url" content="https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/index.html">
+<meta property="og:site_name" content="夏天不热">
+<meta property="og:description" content="问答 mapreduce是干啥的？ 答：mapreduce是一个编程模型，用来处理和生成大规模数据集。用户通过指定map和reduce函数以及输入数据等，将计算任务表达为mapreduce的任务。即使是没有分布式系统编程经验的程序员，也可以通过mapreduce来利用大规模集群，因为mapreduce帮助管理好一切，包括输入数据分区、调度多台机器上的程序执行、处理机器故障和管理机器间的通信等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-04-26T02:45:35.442Z">
+<meta property="article:modified_time" content="2022-04-26T09:08:08.336Z">
+<meta property="article:author" content="Yingjie Fan">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mapreduce论文阅读 | 夏天不热</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">夏天不热</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-schedule">
+
+    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>日程表</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%B4%E5%83%8F.png">
+      <meta itemprop="name" content="Yingjie Fan">
+      <meta itemprop="description" content="飞得比别人高">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夏天不热">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mapreduce论文阅读
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-04-26 10:45:35 / 修改时间：17:08:08" itemprop="dateCreated datePublished" datetime="2022-04-26T10:45:35+08:00">2022-04-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/" itemprop="url" rel="index"><span itemprop="name">分布式存储</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">论文阅读</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="问答">问答</h1>
+<h2 id="mapreduce是干啥的">mapreduce是干啥的？</h2>
+<p>答：mapreduce是一个编程模型，用来处理和生成大规模数据集。用户通过指定map和reduce函数以及输入数据等，将计算任务表达为mapreduce的任务。即使是没有分布式系统编程经验的程序员，也可以通过mapreduce来利用大规模集群，因为mapreduce帮助管理好一切，包括输入数据分区、调度多台机器上的程序执行、处理机器故障和管理机器间的通信等。</p>
+<h2 id="为什么需要mapreduce">为什么需要mapreduce？</h2>
+<p>谷歌内部有上百个需要处理大型数据集的专门实现，这些实现的缺点是掩盖了本来很简单的计算任务，因为需要处理数据分布、负载均衡、故障容错等问题。而mapreduce能够将简单的计算任务从复杂的分布式实现中剥离开来。</p>
+<h1 id="编程模型">编程模型</h1>
+<p>mapreduce的输入输出都是键值对，map和reduce函数由用户指定。map函数接收输入的键值对，并生成中间键值对，所有相同键的值会被组合起来，并被传递给reduce函数。reduce函数接收一个中间键以及该键的所有值。</p>
+<h2 id="例子">例子</h2>
+<p>wordcount：统计所有文件中每个单词出现的次数。</p>
+<p>map和reduce函数的伪代码如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">// key: document name</span><br><span class="line">// value: document contents</span><br><span class="line">for each word w in value:</span><br><span class="line">EmitIntermediate(w, &quot;1&quot;);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">// key: a word</span><br><span class="line">// values: a list of counts</span><br><span class="line">int result = 0;</span><br><span class="line">for each v in values:</span><br><span class="line">result += ParseInt(v);</span><br><span class="line">Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<p>map函数接收一个文件名为key，文件内容为值的键值对，对于文件内容中每一个单词，都emit一个中间键值对，key是word，值是“1”。</p>
+<p>reduce函数接收一个key为word，值为list的键值对，并合并所有的值，最终得到一个结果键值对，键还是word，值是合并的统计值。</p>
+<h2 id="类型">类型</h2>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426170804898.png"
+alt="image-20220426170804898" />
+<figcaption aria-hidden="true">image-20220426170804898</figcaption>
+</figure>
+<p>论文中给出了通常map和reduce的输入输出类型。其中，中间键值对和输出键值对有相同的key。</p>
+<p>在C++实现中，map和reduce的输入输出都是string类型，让用户来处理类型转换问题。</p>
+<h1 id="实现">实现</h1>
+<p>论文中提到针对不同的环境可以有不同的实现，他们针对的环境是谷歌内部的环境。</p>
+<h2 id="执行流程">执行流程</h2>
+<p>整个mapreduce的执行流程图如下。</p>
+<ol type="1">
+<li>首先将输入文件分割成M份，每份通常16MB至64MB（用户可指定）。将程序拷到集群的机器上。<code>这里可以看到，文件分割的大小和GFS底层chunk的大小相近</code></li>
+<li>有一份特殊的程序拷贝，就是master。master需要将总共M个map
+task和R个reduce task分配到空闲的机器上。</li>
+<li>接收了map
+task的worker，读取相应的文件块，解析键值对并传递给map函数，同时将生成的中间键值对缓存在内存中。</li>
+<li>缓存的键值对被分区函数分为R份，并周期性地写入本地磁盘。这些写入位置被报告给master，master负责将这些信息通告reduce
+worker。</li>
+<li>reduce worker利用RPC读取map
+worker生成的文件，对收集到的所有中间键值对进行排序，相同键的值被组合起来。</li>
+<li>将排完序后的键值对传给reduce函数，将结果append到该reduce分区对应的输出文件中。</li>
+<li>流程结束，返回用户代码。</li>
+</ol>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426105253732.png"
+alt="mapreduce工作流程图" />
+<figcaption aria-hidden="true">mapreduce工作流程图</figcaption>
+</figure>
+<h2 id="master数据结构">master数据结构</h2>
+<p>master为每个map和reduce函数存储了状态信息（idle, in-progress, or
+completed)，并为每个非空闲任务记录worker的ID。</p>
+<p>master还负责保存map生成文件的位置和大小，并传递给reduce worker。</p>
+<h2 id="容错">容错</h2>
+<p>主要的容错机制就是重试，master会周期性地ping每一个worker，如果超时就将该worker标记为故障，将该worker上所有map
+task状态置为idle，允许这些task重新分配。对于失效worker上的reduce
+task，处于in
+progress状态的task会被标记为idle，以允许重新分配，而completed状态的reduce
+task不需要重新执行，这时候由GFS来保证reduce
+task的输出文件可用。（因为map
+task生成的中间文件是写入本地磁盘而非GFS，所以失效worker上的completed的task也要重新执行）</p>
+<h3 id="master失效">master失效</h3>
+<p>虽然master有checkpoint机制，但论文中假定master不太可能失效，如果master失效就停止mapreduce任务，让用户检查并重试。</p>
+<h3 id="出现失效时的语义">出现失效时的语义</h3>
+<p>对于具有函数性的map和reduce函数（就是说相同的输入能得到相同的输出），mapreduce提供比较好的语义，即mapreduce的执行结果和没有失效发生时的执行结果是相同的。这个保证依赖于map和reduce执行结果的原子提交，文中只是简单提了一嘴。</p>
+<p>对于非函数性的map或reduce
+task，mapreduce不保证执行结果和不发生失效时执行结果完全一致。</p>
+<h2 id="局部性">局部性</h2>
+<p>master收集GFS中文件的位置信息，并将map
+task放在尽量靠近输入数据的机器上，所以map
+task中大多数输入数据的读取是locally的。</p>
+<h2 id="任务粒度">任务粒度</h2>
+<p>一共M个map task以及R个reduce
+task，我们希望任务尽量细分，让M+R远大于机器总数，这样负载均衡效果好，并且如果某台机器失效，它上面的任务可以均衡分配至别的机器上。但是M+R也不能过大，一个实际的约束是空间消耗，例如master需要为每个task维护一些状态信息。</p>
+<p>进一步，R通常由用户指定，通常选择一个合适的M，使得每个task的输入大小为16到64MB，这样可以利用局部性优化。R通常选取为机器数量多小的倍数。</p>
+<h2 id="备份任务">备份任务</h2>
+<p>主要是为了解决straggler
+的问题，即某些task执行很慢，拖慢了整个mapreduce的进度。解决办法是在mapreduce任务接近完成时，将那些还为完成的task备份执行，即两个task同时执行相同的任务，这样只要一个完成了，那么这个task就完成了。</p>
+<p>这样做增加了少量计算资源的开销，但任务执行时间显著减少。</p>
+<h1 id="refinements">Refinements</h1>
+<h2 id="分区函数partitioning-function">分区函数（Partitioning
+Function）</h2>
+<p>每个map
+worker在生成中间文件时，需要分区函数来对数据进行划分，划分的数量由用户指定的reduce
+task/输出文件个数所决定（每个reduce
+task会生成一个输出文件）。默认的分区函数是哈希<code>hash(key) mod R</code>，这样负载均衡会很好。然而有时需要特殊的分区函数，例如，想要将所有相同host的url划分到相同分区，则可以选择分区函数<code>hash(Hostname(urlkey)) mod R</code>。</p>
+<h2 id="顺序保证">顺序保证</h2>
+<p>reduce
+task在处理一个给定分区的数据时，会按照key升序进行处理（在读取完整的分区的中间数据后，reduce
+worker会对数据进行排序），这样保证了输出文件是有序的。这样做的好处是，支持输出文件针对key的高效随机查询，或者方便了那些需要输出文件有序的用户。</p>
+<h2 id="combiner-function">Combiner Function</h2>
+<p>我们可以想象，map函数所emit的中间键值对中有很多重复的KEY，我们可以提前combine这些KEY，减少资源浪费。例如，wordCount中，由于齐夫定律，会出现很多重复的<code>&lt;the, 1&gt;</code>，可以提前进行合并。合并函数通常和reduce函数相同，不过输出文件位置不一样。</p>
+<h1 id="性能测试">性能测试</h1>
+<p>1800台机器的集群，每台机器4G内存、两个2GHz处理器、两个160G磁盘。两层交换机，根交换机聚合带宽100-200Gbps。这个环境和GFS中的类似。</p>
+<h2 id="grep">Grep</h2>
+<p>Grep任务需要从10^10个大小为100byte的记录中，筛选出符合特定模式的记录（92337条）。输入文件划分为64MB(M=
+15000)，map的输出放在一个文件里（R=1）。</p>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426163554895.png"
+alt="Grep执行过程中数据读取速率" />
+<figcaption aria-hidden="true">Grep执行过程中数据读取速率</figcaption>
+</figure>
+<p>上图是输入数据的读取速率。峰值速率为30GB/s，这个时候集群中大多数节点都启动了，开始读取数据。后面map任务逐渐完成，读取速率开始下降。</p>
+<h2 id="sort">Sort</h2>
+<p>总数据量还是和Grep一样。map函数从每条记录中提取key，并emit提取的key和原始文本行。reduce函数为内置的Identity函数，原样输出得到的数据。</p>
+<p>输入文件划分为64MB(M=
+15000)，输出划分为4000个文件（R=4000）。分区函数使用key的初始几个字节，将数据划分为4000份。</p>
+<p>这里的分区函数使用了先验的key分布知识，通常的排序需要预先对key进行采样，根据采样得到的分布进行数据分区。</p>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426164829004.png"
+alt="Sort执行中的数据传输速率" />
+<figcaption aria-hidden="true">Sort执行中的数据传输速率</figcaption>
+</figure>
+<p>上图为执行Sort任务时的数据传输速率，从最上方的图可以看到，map执行时的峰值速率为13GB，比前面Grep的要低，这是因为Sort中的map函数需要写入本地磁盘的中间数据量很大，这占用了大约一半的IO带宽。而Grep的中间数据大小可忽略。</p>
+<p>中间的图是shuffling过程，即reduce worker从map
+worker读数据的过程。可以看到，第一个map任务完成，reduce任务就立即开始读数据。有两个驼峰，第一个峰表示的是第一次批处理1700个reduce任务，大约300s处理完成，开始第二批任务，大约600s整个shuffling过程结束。可以看出shuffle的速率低于map阶段的输入速率，因为map阶段的读取基本都是local的，而shuffle有很多网络传输。</p>
+<p>下面的图是reduce
+worker写数据的速率。可以看到，从第一个shuffle完成到第一个reduce
+worker开始写入，中间有一段时间间隔，因为中间数据需要进行排序。写入速率低于shuffle的速率，因为写入是往GFS里面写，要写双副本。</p>
+<p>论文后面还分析了备份任务和故障恢复对性能的影响，这里就不列举了。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yingjie Fan
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" title="mapreduce论文阅读">https://fanyingjie11.github.io/2022/04/26/mapreduce论文阅读/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/" rel="prev" title="如何让markdown中公式在hexo博客中显示">
+      <i class="fa fa-chevron-left"></i> 如何让markdown中公式在hexo博客中显示
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC81NjA3OS8zMjU0Mg=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%97%AE%E7%AD%94"><span class="nav-number">1.</span> <span class="nav-text">问答</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mapreduce%E6%98%AF%E5%B9%B2%E5%95%A5%E7%9A%84"><span class="nav-number">1.1.</span> <span class="nav-text">mapreduce是干啥的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81mapreduce"><span class="nav-number">1.2.</span> <span class="nav-text">为什么需要mapreduce？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">2.1.</span> <span class="nav-text">例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">执行流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#master%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.</span> <span class="nav-text">master数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E9%94%99"><span class="nav-number">3.3.</span> <span class="nav-text">容错</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#master%E5%A4%B1%E6%95%88"><span class="nav-number">3.3.1.</span> <span class="nav-text">master失效</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E7%8E%B0%E5%A4%B1%E6%95%88%E6%97%B6%E7%9A%84%E8%AF%AD%E4%B9%89"><span class="nav-number">3.3.2.</span> <span class="nav-text">出现失效时的语义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7"><span class="nav-number">3.4.</span> <span class="nav-text">局部性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%B2%92%E5%BA%A6"><span class="nav-number">3.5.</span> <span class="nav-text">任务粒度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.6.</span> <span class="nav-text">备份任务</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#refinements"><span class="nav-number">4.</span> <span class="nav-text">Refinements</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E5%87%BD%E6%95%B0partitioning-function"><span class="nav-number">4.1.</span> <span class="nav-text">分区函数（Partitioning
+Function）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E4%BF%9D%E8%AF%81"><span class="nav-number">4.2.</span> <span class="nav-text">顺序保证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#combiner-function"><span class="nav-number">4.3.</span> <span class="nav-text">Combiner Function</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="nav-number">5.</span> <span class="nav-text">性能测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#grep"><span class="nav-number">5.1.</span> <span class="nav-text">Grep</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sort"><span class="nav-number">5.2.</span> <span class="nav-text">Sort</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Yingjie Fan"
+      src="/images/%E5%A4%B4%E5%83%8F.png">
+  <p class="site-author-name" itemprop="name">Yingjie Fan</p>
+  <div class="site-description" itemprop="description">飞得比别人高</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/fanyingjie11" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;fanyingjie11" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/yjfan_1@foxmail.com" title="E-Mail → yjfan_1@foxmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://fanyingjie11.github.io/2022/04/13/GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0/" title="https:&#x2F;&#x2F;fanyingjie11.github.io&#x2F;2022&#x2F;04&#x2F;13&#x2F;GFS%E8%AF%BB%E5%90%8E%E7%AC%94%E8%AE%B0&#x2F;">GFS笔记</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; Wed Apr 13 2022 08:00:00 GMT+0800 (中国标准时间) – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yingjie Fan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+</html>

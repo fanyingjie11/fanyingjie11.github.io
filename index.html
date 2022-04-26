@@ -167,6 +167,195 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%B4%E5%83%8F.png">
+      <meta itemprop="name" content="Yingjie Fan">
+      <meta itemprop="description" content="飞得比别人高">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夏天不热">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" class="post-title-link" itemprop="url">mapreduce论文阅读</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-04-26 10:45:35 / 修改时间：17:08:08" itemprop="dateCreated datePublished" datetime="2022-04-26T10:45:35+08:00">2022-04-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/" itemprop="url" rel="index"><span itemprop="name">分布式存储</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AD%98%E5%82%A8/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" itemprop="url" rel="index"><span itemprop="name">论文阅读</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="问答">问答</h1>
+<h2 id="mapreduce是干啥的">mapreduce是干啥的？</h2>
+<p>答：mapreduce是一个编程模型，用来处理和生成大规模数据集。用户通过指定map和reduce函数以及输入数据等，将计算任务表达为mapreduce的任务。即使是没有分布式系统编程经验的程序员，也可以通过mapreduce来利用大规模集群，因为mapreduce帮助管理好一切，包括输入数据分区、调度多台机器上的程序执行、处理机器故障和管理机器间的通信等。</p>
+<h2 id="为什么需要mapreduce">为什么需要mapreduce？</h2>
+<p>谷歌内部有上百个需要处理大型数据集的专门实现，这些实现的缺点是掩盖了本来很简单的计算任务，因为需要处理数据分布、负载均衡、故障容错等问题。而mapreduce能够将简单的计算任务从复杂的分布式实现中剥离开来。</p>
+<h1 id="编程模型">编程模型</h1>
+<p>mapreduce的输入输出都是键值对，map和reduce函数由用户指定。map函数接收输入的键值对，并生成中间键值对，所有相同键的值会被组合起来，并被传递给reduce函数。reduce函数接收一个中间键以及该键的所有值。</p>
+<h2 id="例子">例子</h2>
+<p>wordcount：统计所有文件中每个单词出现的次数。</p>
+<p>map和reduce函数的伪代码如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">map(String key, String value):</span><br><span class="line">// key: document name</span><br><span class="line">// value: document contents</span><br><span class="line">for each word w in value:</span><br><span class="line">EmitIntermediate(w, &quot;1&quot;);</span><br><span class="line"></span><br><span class="line">reduce(String key, Iterator values):</span><br><span class="line">// key: a word</span><br><span class="line">// values: a list of counts</span><br><span class="line">int result = 0;</span><br><span class="line">for each v in values:</span><br><span class="line">result += ParseInt(v);</span><br><span class="line">Emit(AsString(result));</span><br></pre></td></tr></table></figure>
+<p>map函数接收一个文件名为key，文件内容为值的键值对，对于文件内容中每一个单词，都emit一个中间键值对，key是word，值是“1”。</p>
+<p>reduce函数接收一个key为word，值为list的键值对，并合并所有的值，最终得到一个结果键值对，键还是word，值是合并的统计值。</p>
+<h2 id="类型">类型</h2>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426170804898.png"
+alt="image-20220426170804898" />
+<figcaption aria-hidden="true">image-20220426170804898</figcaption>
+</figure>
+<p>论文中给出了通常map和reduce的输入输出类型。其中，中间键值对和输出键值对有相同的key。</p>
+<p>在C++实现中，map和reduce的输入输出都是string类型，让用户来处理类型转换问题。</p>
+<h1 id="实现">实现</h1>
+<p>论文中提到针对不同的环境可以有不同的实现，他们针对的环境是谷歌内部的环境。</p>
+<h2 id="执行流程">执行流程</h2>
+<p>整个mapreduce的执行流程图如下。</p>
+<ol type="1">
+<li>首先将输入文件分割成M份，每份通常16MB至64MB（用户可指定）。将程序拷到集群的机器上。<code>这里可以看到，文件分割的大小和GFS底层chunk的大小相近</code></li>
+<li>有一份特殊的程序拷贝，就是master。master需要将总共M个map
+task和R个reduce task分配到空闲的机器上。</li>
+<li>接收了map
+task的worker，读取相应的文件块，解析键值对并传递给map函数，同时将生成的中间键值对缓存在内存中。</li>
+<li>缓存的键值对被分区函数分为R份，并周期性地写入本地磁盘。这些写入位置被报告给master，master负责将这些信息通告reduce
+worker。</li>
+<li>reduce worker利用RPC读取map
+worker生成的文件，对收集到的所有中间键值对进行排序，相同键的值被组合起来。</li>
+<li>将排完序后的键值对传给reduce函数，将结果append到该reduce分区对应的输出文件中。</li>
+<li>流程结束，返回用户代码。</li>
+</ol>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426105253732.png"
+alt="mapreduce工作流程图" />
+<figcaption aria-hidden="true">mapreduce工作流程图</figcaption>
+</figure>
+<h2 id="master数据结构">master数据结构</h2>
+<p>master为每个map和reduce函数存储了状态信息（idle, in-progress, or
+completed)，并为每个非空闲任务记录worker的ID。</p>
+<p>master还负责保存map生成文件的位置和大小，并传递给reduce worker。</p>
+<h2 id="容错">容错</h2>
+<p>主要的容错机制就是重试，master会周期性地ping每一个worker，如果超时就将该worker标记为故障，将该worker上所有map
+task状态置为idle，允许这些task重新分配。对于失效worker上的reduce
+task，处于in
+progress状态的task会被标记为idle，以允许重新分配，而completed状态的reduce
+task不需要重新执行，这时候由GFS来保证reduce
+task的输出文件可用。（因为map
+task生成的中间文件是写入本地磁盘而非GFS，所以失效worker上的completed的task也要重新执行）</p>
+<h3 id="master失效">master失效</h3>
+<p>虽然master有checkpoint机制，但论文中假定master不太可能失效，如果master失效就停止mapreduce任务，让用户检查并重试。</p>
+<h3 id="出现失效时的语义">出现失效时的语义</h3>
+<p>对于具有函数性的map和reduce函数（就是说相同的输入能得到相同的输出），mapreduce提供比较好的语义，即mapreduce的执行结果和没有失效发生时的执行结果是相同的。这个保证依赖于map和reduce执行结果的原子提交，文中只是简单提了一嘴。</p>
+<p>对于非函数性的map或reduce
+task，mapreduce不保证执行结果和不发生失效时执行结果完全一致。</p>
+<h2 id="局部性">局部性</h2>
+<p>master收集GFS中文件的位置信息，并将map
+task放在尽量靠近输入数据的机器上，所以map
+task中大多数输入数据的读取是locally的。</p>
+<h2 id="任务粒度">任务粒度</h2>
+<p>一共M个map task以及R个reduce
+task，我们希望任务尽量细分，让M+R远大于机器总数，这样负载均衡效果好，并且如果某台机器失效，它上面的任务可以均衡分配至别的机器上。但是M+R也不能过大，一个实际的约束是空间消耗，例如master需要为每个task维护一些状态信息。</p>
+<p>进一步，R通常由用户指定，通常选择一个合适的M，使得每个task的输入大小为16到64MB，这样可以利用局部性优化。R通常选取为机器数量多小的倍数。</p>
+<h2 id="备份任务">备份任务</h2>
+<p>主要是为了解决straggler
+的问题，即某些task执行很慢，拖慢了整个mapreduce的进度。解决办法是在mapreduce任务接近完成时，将那些还为完成的task备份执行，即两个task同时执行相同的任务，这样只要一个完成了，那么这个task就完成了。</p>
+<p>这样做增加了少量计算资源的开销，但任务执行时间显著减少。</p>
+<h1 id="refinements">Refinements</h1>
+<h2 id="分区函数partitioning-function">分区函数（Partitioning
+Function）</h2>
+<p>每个map
+worker在生成中间文件时，需要分区函数来对数据进行划分，划分的数量由用户指定的reduce
+task/输出文件个数所决定（每个reduce
+task会生成一个输出文件）。默认的分区函数是哈希<code>hash(key) mod R</code>，这样负载均衡会很好。然而有时需要特殊的分区函数，例如，想要将所有相同host的url划分到相同分区，则可以选择分区函数<code>hash(Hostname(urlkey)) mod R</code>。</p>
+<h2 id="顺序保证">顺序保证</h2>
+<p>reduce
+task在处理一个给定分区的数据时，会按照key升序进行处理（在读取完整的分区的中间数据后，reduce
+worker会对数据进行排序），这样保证了输出文件是有序的。这样做的好处是，支持输出文件针对key的高效随机查询，或者方便了那些需要输出文件有序的用户。</p>
+<h2 id="combiner-function">Combiner Function</h2>
+<p>我们可以想象，map函数所emit的中间键值对中有很多重复的KEY，我们可以提前combine这些KEY，减少资源浪费。例如，wordCount中，由于齐夫定律，会出现很多重复的<code>&lt;the, 1&gt;</code>，可以提前进行合并。合并函数通常和reduce函数相同，不过输出文件位置不一样。</p>
+<h1 id="性能测试">性能测试</h1>
+<p>1800台机器的集群，每台机器4G内存、两个2GHz处理器、两个160G磁盘。两层交换机，根交换机聚合带宽100-200Gbps。这个环境和GFS中的类似。</p>
+<h2 id="grep">Grep</h2>
+<p>Grep任务需要从10^10个大小为100byte的记录中，筛选出符合特定模式的记录（92337条）。输入文件划分为64MB(M=
+15000)，map的输出放在一个文件里（R=1）。</p>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426163554895.png"
+alt="Grep执行过程中数据读取速率" />
+<figcaption aria-hidden="true">Grep执行过程中数据读取速率</figcaption>
+</figure>
+<p>上图是输入数据的读取速率。峰值速率为30GB/s，这个时候集群中大多数节点都启动了，开始读取数据。后面map任务逐渐完成，读取速率开始下降。</p>
+<h2 id="sort">Sort</h2>
+<p>总数据量还是和Grep一样。map函数从每条记录中提取key，并emit提取的key和原始文本行。reduce函数为内置的Identity函数，原样输出得到的数据。</p>
+<p>输入文件划分为64MB(M=
+15000)，输出划分为4000个文件（R=4000）。分区函数使用key的初始几个字节，将数据划分为4000份。</p>
+<p>这里的分区函数使用了先验的key分布知识，通常的排序需要预先对key进行采样，根据采样得到的分布进行数据分区。</p>
+<figure>
+<img
+src="/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/image-20220426164829004.png"
+alt="Sort执行中的数据传输速率" />
+<figcaption aria-hidden="true">Sort执行中的数据传输速率</figcaption>
+</figure>
+<p>上图为执行Sort任务时的数据传输速率，从最上方的图可以看到，map执行时的峰值速率为13GB，比前面Grep的要低，这是因为Sort中的map函数需要写入本地磁盘的中间数据量很大，这占用了大约一半的IO带宽。而Grep的中间数据大小可忽略。</p>
+<p>中间的图是shuffling过程，即reduce worker从map
+worker读数据的过程。可以看到，第一个map任务完成，reduce任务就立即开始读数据。有两个驼峰，第一个峰表示的是第一次批处理1700个reduce任务，大约300s处理完成，开始第二批任务，大约600s整个shuffling过程结束。可以看出shuffle的速率低于map阶段的输入速率，因为map阶段的读取基本都是local的，而shuffle有很多网络传输。</p>
+<p>下面的图是reduce
+worker写数据的速率。可以看到，从第一个shuffle完成到第一个reduce
+worker开始写入，中间有一段时间间隔，因为中间数据需要进行排序。写入速率低于shuffle的速率，因为写入是往GFS里面写，要写双副本。</p>
+<p>论文后面还分析了备份任务和故障恢复对性能的影响，这里就不列举了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -959,7 +1148,7 @@ log并应用相同的修改到本地。它也在开始时和chunkserver通信获
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
