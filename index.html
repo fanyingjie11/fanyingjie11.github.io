@@ -167,6 +167,111 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/%E5%A4%B4%E5%83%8F.png">
+      <meta itemprop="name" content="Yingjie Fan">
+      <meta itemprop="description" content="飞得比别人高">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夏天不热">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">《More Effective C++》阅读</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-07 17:31:45" itemprop="dateCreated datePublished" datetime="2022-05-07T17:31:45+08:00">2022-05-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 17:34:19" itemprop="dateModified" datetime="2022-05-09T17:34:19+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">程序设计</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="基础议题">基础议题</h1>
+<p>涉及四个条款，主要涉及指针和引用的区别、C++转型操作符、数组和构造函数。</p>
+<h2 id="仔细区别指针和引用">仔细区别指针和引用</h2>
+<ol type="1">
+<li>有空指针但没有空引用，如果需要一个变量可能指向也可能不指向一个对象，则需要用指针。</li>
+<li>引用可能比指针效率更高，因为没有空引用，所以不需要检查是否为空。</li>
+<li>指针可以被重新赋值，引用不行。</li>
+</ol>
+<p>一个特例是，重载操作符[]时，必须返回引用，因为返回的东西必须能被赋值。</p>
+<p>总结：当需要指向某个东西，且不会改变其指向时，或者指针不能满足需求时，使用引用。其他情况使用指针。</p>
+<h2 id="最好使用c转型操作符">最好使用C++转型操作符</h2>
+<p>C语言的()转型有很多缺点，C++提供了更好的控制。</p>
+<p>static_cast基本和C的转型相同（想起腾讯的面试题：static_cast和C语言类型转换的区别。。。）</p>
+<p>const_cast只能用来去除变量的const属性上，其余用法皆是错的。</p>
+<p>dynamic_cast用于继层体系中向下转型，转型失败返回空指针（转型对象是指针）或抛异常（转型对象是引用）。</p>
+<p>reinterpret_cast最常用于转换函数指针的类型（建议少用，记得muduo里面用过）。</p>
+<h2 id="绝不以多态方式处理数组">绝不以多态方式处理数组</h2>
+<p>根本原因是，如果利用基类的指针或引用指向派生类的数组，而在代码中又含有（或者隐式含有）指针运算，则必然会出错，因为指针运算默认对象大小是基类的大小而非派生类的大小。</p>
+<h2 id="非必要不提供默认构造函数">非必要不提供默认构造函数</h2>
+<p>不提供默认构造函数有一下限制：</p>
+<ol type="1">
+<li>难以产生一个无默认构造函数的类的数组。</li>
+<li>某些设计不佳的模板需要类系统默认构造函数。</li>
+<li>继承体系中，如果没有默认构造函数，派生类必须提供自变量给父类的构造函数。</li>
+</ol>
+<p>关于第一点，文中给出几种解决办法。</p>
+<p>一是定义非堆数组，在定义时给出必要的自变量。</p>
+<p>二是使用指针，后面对每个指针在堆上构造对象，提供自变量，缺点很明显，指针太垃圾。</p>
+<p>三是利用placement
+new，先分配内存再构造对象，缺点是比较难，还需要在手动调用析构函数和operator
+delete。</p>
+<p>虽然有上述限制，但条款仍然成立，因为：若class内的某些对象可以是无意义的，那么成员函数就必须检查是否数据成员有意义，影响效率。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/05/05/Bigtable%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1388,7 +1493,7 @@ log并应用相同的修改到本地。它也在开始时和chunkserver通信获
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
