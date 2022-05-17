@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"fanyingjie11.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="基础议题 涉及四个条款，主要涉及指针和引用的区别、C++转型操作符、数组和构造函数。 仔细区别指针和引用  有空指针但没有空引用，如果需要一个变量可能指向也可能不指向一个对象，则需要用指针。 引用可能比指针效率更高，因为没有空引用，所以不需要检查是否为空。 指针可以被重新赋值，引用不行。  一个特例是，重载操作符[]时，必须返回引用，因为返回的东西必须能被赋值。 总结：当需要指向">
+  <meta name="description" content="规则：  map阶段需要将中间键值对划分到nRduce个桶，提供给reduce task. worker需要将第x个reduce task的输出保存在文件mr-out-X中。 输出文件mr-out-X中每一行对应一个reduce函数的输出。注意输出格式。 能够修改的文件有mr&#x2F;worker.go、mr&#x2F;master.go、mr&#x2F;rpc.go。 map的输出文件存放在当前目录。 m">
 <meta property="og:type" content="article">
-<meta property="og:title" content="《More Effective C++》阅读">
-<meta property="og:url" content="https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:title" content="夏天不热">
+<meta property="og:url" content="https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/index.html">
 <meta property="og:site_name" content="夏天不热">
-<meta property="og:description" content="基础议题 涉及四个条款，主要涉及指针和引用的区别、C++转型操作符、数组和构造函数。 仔细区别指针和引用  有空指针但没有空引用，如果需要一个变量可能指向也可能不指向一个对象，则需要用指针。 引用可能比指针效率更高，因为没有空引用，所以不需要检查是否为空。 指针可以被重新赋值，引用不行。  一个特例是，重载操作符[]时，必须返回引用，因为返回的东西必须能被赋值。 总结：当需要指向">
+<meta property="og:description" content="规则：  map阶段需要将中间键值对划分到nRduce个桶，提供给reduce task. worker需要将第x个reduce task的输出保存在文件mr-out-X中。 输出文件mr-out-X中每一行对应一个reduce函数的输出。注意输出格式。 能够修改的文件有mr&#x2F;worker.go、mr&#x2F;master.go、mr&#x2F;rpc.go。 map的输出文件存放在当前目录。 m">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-05-07T09:31:45.325Z">
-<meta property="article:modified_time" content="2022-05-09T09:34:19.180Z">
+<meta property="article:published_time" content="2022-05-09T13:55:12.149Z">
+<meta property="article:modified_time" content="2022-05-09T14:16:09.547Z">
 <meta property="article:author" content="Yingjie Fan">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+<link rel="canonical" href="https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/">
 
 
 <script id="page-configurations">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>《More Effective C++》阅读 | 夏天不热</title>
+  <title> | 夏天不热</title>
   
 
 
@@ -170,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+    <link itemprop="mainEntityOfPage" href="https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/%E5%A4%B4%E5%83%8F.png">
@@ -183,7 +183,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          《More Effective C++》阅读
+          
         </h1>
 
         <div class="post-meta">
@@ -192,24 +192,9 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-05-07 17:31:45" itemprop="dateCreated datePublished" datetime="2022-05-07T17:31:45+08:00">2022-05-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-09 17:34:19" itemprop="dateModified" datetime="2022-05-09T17:34:19+08:00">2022-05-09</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">程序设计</span></a>
-                </span>
+              <time title="创建时间：2022-05-09 21:55:12 / 修改时间：22:16:09" itemprop="dateCreated datePublished" datetime="2022-05-09T21:55:12+08:00">2022-05-09</time>
             </span>
 
           
@@ -230,38 +215,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="基础议题">基础议题</h1>
-<p>涉及四个条款，主要涉及指针和引用的区别、C++转型操作符、数组和构造函数。</p>
-<h2 id="仔细区别指针和引用">仔细区别指针和引用</h2>
+        <p>规则：</p>
 <ol type="1">
-<li>有空指针但没有空引用，如果需要一个变量可能指向也可能不指向一个对象，则需要用指针。</li>
-<li>引用可能比指针效率更高，因为没有空引用，所以不需要检查是否为空。</li>
-<li>指针可以被重新赋值，引用不行。</li>
+<li>map阶段需要将中间键值对划分到<code>nRduce</code>个桶，提供给reduce
+task.</li>
+<li>worker需要将第x个reduce
+task的输出保存在文件<code>mr-out-X</code>中。</li>
+<li>输出文件<code>mr-out-X</code>中每一行对应一个reduce函数的输出。注意输出格式。</li>
+<li>能够修改的文件有<code>mr/worker.go</code>、<code>mr/master.go</code>、<code>mr/rpc.go</code>。</li>
+<li>map的输出文件存放在当前目录。</li>
+<li><code>main/mrmaster.go</code>需要<code>mr/master.go</code>实现<code>Done()</code>方法，在MapReduce任务完成后返回TRUE，好让mrmaster.go终止。</li>
+<li>当任务完成猴，worker进行需要终止。</li>
 </ol>
-<p>一个特例是，重载操作符[]时，必须返回引用，因为返回的东西必须能被赋值。</p>
-<p>总结：当需要指向某个东西，且不会改变其指向时，或者指针不能满足需求时，使用引用。其他情况使用指针。</p>
-<h2 id="最好使用c转型操作符">最好使用C++转型操作符</h2>
-<p>C语言的()转型有很多缺点，C++提供了更好的控制。</p>
-<p>static_cast基本和C的转型相同（想起腾讯的面试题：static_cast和C语言类型转换的区别。。。）</p>
-<p>const_cast只能用来去除变量的const属性上，其余用法皆是错的。</p>
-<p>dynamic_cast用于继层体系中向下转型，转型失败返回空指针（转型对象是指针）或抛异常（转型对象是引用）。</p>
-<p>reinterpret_cast最常用于转换函数指针的类型（建议少用，记得muduo里面用过）。</p>
-<h2 id="绝不以多态方式处理数组">绝不以多态方式处理数组</h2>
-<p>根本原因是，如果利用基类的指针或引用指向派生类的数组，而在代码中又含有（或者隐式含有）指针运算，则必然会出错，因为指针运算默认对象大小是基类的大小而非派生类的大小。</p>
-<h2 id="非必要不提供默认构造函数">非必要不提供默认构造函数</h2>
-<p>不提供默认构造函数有一下限制：</p>
-<ol type="1">
-<li>难以产生一个无默认构造函数的类的数组。</li>
-<li>某些设计不佳的模板需要类系统默认构造函数。</li>
-<li>继承体系中，如果没有默认构造函数，派生类必须提供自变量给父类的构造函数。</li>
-</ol>
-<p>关于第一点，文中给出几种解决办法。</p>
-<p>一是定义非堆数组，在定义时给出必要的自变量。</p>
-<p>二是使用指针，后面对每个指针在堆上构造对象，提供自变量，缺点很明显，指针太垃圾。</p>
-<p>三是利用placement
-new，先分配内存再构造对象，缺点是比较难，还需要在手动调用析构函数和operator
-delete。</p>
-<p>虽然有上述限制，但条款仍然成立，因为：若class内的某些对象可以是无意义的，那么成员函数就必须检查是否数据成员有意义，影响效率。</p>
 
     </div>
 
@@ -277,7 +242,7 @@ delete。</p>
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" title="《More Effective C++》阅读">https://fanyingjie11.github.io/2022/05/07/MEC阅读笔记/</a>
+    <a href="https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/" title="">https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -294,10 +259,13 @@ delete。</p>
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/05/05/Bigtable%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="prev" title="Bigtable论文阅读">
-      <i class="fa fa-chevron-left"></i> Bigtable论文阅读
+    <a href="/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="《More Effective C++》阅读（一）">
+      <i class="fa fa-chevron-left"></i> 《More Effective C++》阅读（一）
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/12/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="next" title="《More Effective C++》阅读（二）">
+      《More Effective C++》阅读（二） <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -361,7 +329,6 @@ delete。</p>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E8%AE%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">基础议题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%94%E7%BB%86%E5%8C%BA%E5%88%AB%E6%8C%87%E9%92%88%E5%92%8C%E5%BC%95%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">仔细区别指针和引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A5%BD%E4%BD%BF%E7%94%A8c%E8%BD%AC%E5%9E%8B%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-number">1.2.</span> <span class="nav-text">最好使用C++转型操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9D%E4%B8%8D%E4%BB%A5%E5%A4%9A%E6%80%81%E6%96%B9%E5%BC%8F%E5%A4%84%E7%90%86%E6%95%B0%E7%BB%84"><span class="nav-number">1.3.</span> <span class="nav-text">绝不以多态方式处理数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%9E%E5%BF%85%E8%A6%81%E4%B8%8D%E6%8F%90%E4%BE%9B%E9%BB%98%E8%AE%A4%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">非必要不提供默认构造函数</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -377,7 +344,7 @@ delete。</p>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

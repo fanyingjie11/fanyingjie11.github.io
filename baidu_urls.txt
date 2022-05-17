@@ -1,5 +1,5 @@
-https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/
+https://fanyingjie11.github.io/2022/05/17/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/
+https://fanyingjie11.github.io/2022/05/12/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/
+https://fanyingjie11.github.io/2022/05/09/MIT_6_824_lab1/
+https://fanyingjie11.github.io/2022/05/07/MEC%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/
 https://fanyingjie11.github.io/2022/05/05/Bigtable%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/
-https://fanyingjie11.github.io/2022/04/26/mapreduce%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/
-https://fanyingjie11.github.io/2022/04/18/%E5%A6%82%E4%BD%95%E8%AE%A9markdown%E4%B8%AD%E5%85%AC%E5%BC%8F%E5%9C%A8hexo%E5%8D%9A%E5%AE%A2%E4%B8%AD%E6%98%BE%E7%A4%BA/
-https://fanyingjie11.github.io/2022/04/18/%E7%89%9B%E9%A1%BF%E6%B3%95/
